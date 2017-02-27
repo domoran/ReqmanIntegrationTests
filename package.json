@@ -1,0 +1,29 @@
+{
+  "name": "rmdx_reqman_integration_tests",
+  "version": "1.0.0",
+  "description": "Reqman / RMDX Integration Tests",
+  "main": "test_config.js",
+  "dependencies": {
+    "async": "^2.1.5",
+    "jasmine-node": "^1.14.5",
+    "nock": "^9.0.7",
+    "protractor": "^5.1.1",
+    "protractor-helpers": "^1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "unit": "./node_modules/.bin/jasmine-node --captureExceptions --autotest src/utils",
+    "config": "./node_modules/.bin/protractor test_config.js --suite configure",
+    "tests": "./node_modules/.bin/protractor test_config.js --suite api,integration"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/domoran/ReqmanIntegrationTests.git"
+  },
+  "author": "Mathias Mamsch",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/domoran/ReqmanIntegrationTests/issues"
+  },
+  "homepage": "https://github.com/domoran/ReqmanIntegrationTests#readme"
+}

@@ -8,17 +8,26 @@ This repository contains the integration tests for two proprietary software prod
 
 ### Prerequisites
 
-* [Node](https://nodejs.org) 6.9+
-* [Git](https://git-scm.com/) (for checking out this repository)
-* Make sure Protractor is installed by running:
-```
-    npm install -g protractor
-    webdriver-manager update
-```
-* Launch a cmd.exe shell (make sure node 6.9 is in your path)
+* Install [Node 6.9](https://nodejs.org)
+* Install [Git](https://git-scm.com/) (for checking out this repository)
+* Install [Selenium Server](http://docs.seleniumhq.org/download) (see below)
 
+### Installing and Starting Selenium Server
 
-### Installing
+* Make sure that you have a [Java Runtime Environment](https://www.java.com/de/download/) on your machine and that "java.exe" is on your path.
+* Download the [Selenium Server Standalone](http://selenium-release.storage.googleapis.com/3.1/selenium-server-standalone-3.1.0.jar)
+* Download the [Selenium Chrome Driver](https://chromedriver.storage.googleapis.com/2.27/chromedriver_win32.zip)
+* Put both files inside a directory (extract the chromedriver)
+* In the directory of the Selenium Server create a "start.bat" file:
+
+```
+start java -jar selenium-server-standalone-3.1.0.jar -role hub -port 4445
+timeout /T 3
+start java -Dwebdriver.chrome.driver=%CD%\chromedriver.exe -jar selenium-server-standalone-3.1.0.jar -role node -host localhost -hubHost localhost -hubPort 4445
+```
+* Run the start.bat file (two java processes should come up after some time)
+
+### Installing the Test Framework
 
 1. checkout the git repository
 ```
@@ -32,19 +41,22 @@ This repository contains the integration tests for two proprietary software prod
 ```
   npm install
 ```
+
 ## Running the tests
 
-1. Set the necessary evironment variables (Reqman API Key and server host/port)
+1. Set the necessary evironment variables (first start only)
 ```
-  SET REQMANAPIKEY=eyJhb...cze8
-  SET REQMANSERVER=localhost:90
+  SET REQMANSERVER=http://localhost:90
 ```
-2. Start the Protractor web driver manager
+2. make sure that the API tokens are correctly configured (only once)
 ```
-  start webdriver-manager start
+  npm run config
 ```
-3. start the tests
+This will create an API Token on your Reqman installation and store it to a *reqman_config.json* file.
+3. Run the tests
 ```
-  protractor config.js
+  npm run tests
 ```
+
+
 
