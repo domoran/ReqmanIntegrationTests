@@ -58,5 +58,11 @@ This will create an API Token on your Reqman installation and store it to a *req
   npm run tests
 ```
 
+## Contributing
+
+After adding code, make sure to run the linter to ensure consistent formatting of your code:
+```
+  npm run lint
+```
 
 
