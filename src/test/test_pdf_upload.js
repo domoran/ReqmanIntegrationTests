@@ -79,7 +79,7 @@ describe("Reqman Server Test", function() {
     });
 
     it("Should be able to login as admin", function () {
-        PageLogin.login("admin", "ReqMan_V2");
+        PageLogin.login(config.adminUser, config.adminPass);
         browser.wait(EC.presenceOf(element(by.linkText("Logout"))), 5000);
     });
 
@@ -113,8 +113,11 @@ describe("Reqman Server Test", function() {
             expect(error).toEqual(null);
             expect(data.state).toBe("Finished");
 
-        // goto forward page
-            browser.get(data.link);
+            // goto forward page
+            // $escaped = urlencode(data.link)
+            browser.get(data.link); //    in RMDX: /apilogin/$token;returnURL=$escaped
+
+            // assert: Browser redirect - URL ist nun data.link 
 
         // Visual checks in Reqman GUI
             var el1 = element(by.xpath("//*[contains(text(), 'Ich bin ein Heading')]"));

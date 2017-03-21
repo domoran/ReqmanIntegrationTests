@@ -5,6 +5,7 @@ var Request = require("./Request");
 */
 var wrap_response = function (callback) {
     return function (status, headers, data) {
+    	console.log(headers["content-type"]);
         if (headers["content-type"] && headers["content-type"].indexOf("/json") >= 1) {
             try {
                 data = JSON.parse(data);
@@ -48,6 +49,23 @@ module.exports = function (reqmanConfig) {
             };
 
             return request.post(uri, headers, JSON.stringify(data), wrap_response(callback) );
+        },
+        
+        put: function (uri, data, callback) {
+            var headers = {
+                authorization : "Bearer " + reqmanConfig.token,
+                "content-type": "application/json",
+            };
+
+            return request.put(uri, headers, JSON.stringify(data), callback );
+        },
+        
+        del: function (uri, callback) {
+            var headers = {
+                authorization : "Bearer " + reqmanConfig.token,
+            };
+
+            return request.del(uri, headers, callback );
         },
 
     };

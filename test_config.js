@@ -6,11 +6,13 @@ exports.config = {
 
   suites: {
     configure: 'src/test/test_configure.js',
+    
+    deb: 'src/test/debug.js',
 
     api: 'src/test/test_api.js',
 
     integration: [
-      'src/test/test_pdf_upload.js',
+      'src/test/test_pdf_upload_userLogin.js',
     ]
   },
 

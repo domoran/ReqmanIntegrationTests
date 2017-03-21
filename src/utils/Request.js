@@ -71,5 +71,20 @@ module.exports = function (baseURL) {
             if (data) req.write(data);
             req.end();
         },
+        
+        put: function (uri, headers, data, callback) {
+            var options = makeOptions("PUT", baseURL + uri, headers);
+
+            var req = callhttp(options, callback);
+            if (data) req.write(data);
+            req.end();
+        },
+        
+        del: function (uri, headers, callback) {
+            var options = makeOptions("DELETE", baseURL + uri, headers);
+
+            var req = callhttp(options, callback);
+            req.end();
+        },
     };
 };
