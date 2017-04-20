@@ -3,8 +3,14 @@ var http = require("http"),
 
 var LOGREQUESTS = false;
 
-var makeOptions = function (method, uri, headers) {
-    var urlConfig = url.parse(uri);
+var makeOptions = function (method, uri, headers, base) {
+	
+	var urlConfig;
+	// Check if URI contains baseURL
+	if ((uri.lastIndexOf(base, 0) === 0))
+		urlConfig = url.parse(uri);
+	else
+		urlConfig = url.parse(base + uri);
 
   // console.log(urlConfig);
 
@@ -45,15 +51,17 @@ var callhttp = function (options, callback) {
 module.exports = function (baseURL) {
     return {
         get: function (uri, headers, callback) {
-            var options = makeOptions("GET", baseURL + uri, headers);
+            var options = makeOptions("GET", uri, headers, baseURL);
 
             var req = callhttp(options, callback);
             req.end();
         },
 
         download: function(uri, headers, callback) {
-            var options = makeOptions("GET", baseURL + uri, headers);
+        	if (uri)
+            var options = makeOptions("GET", uri, headers, baseURL);
 
+//        	console.log("Hostname: " + options.hostname + " Port: " + options.port + " Path: " + options.path);
             var req = http.request(options, function (response) {
                 if (response.statusCode >= 300) {
                     callback("Error downloading url " + baseURL + uri + "!", response);
@@ -65,7 +73,7 @@ module.exports = function (baseURL) {
         },
 
         post: function (uri, headers, data, callback) {
-            var options = makeOptions("POST", baseURL + uri, headers);
+            var options = makeOptions("POST", uri, headers, baseURL);
 
             var req = callhttp(options, callback);
             if (data) req.write(data);
@@ -73,7 +81,7 @@ module.exports = function (baseURL) {
         },
         
         put: function (uri, headers, data, callback) {
-            var options = makeOptions("PUT", baseURL + uri, headers);
+            var options = makeOptions("PUT", uri, headers, baseURL);
 
             var req = callhttp(options, callback);
             if (data) req.write(data);
@@ -81,7 +89,7 @@ module.exports = function (baseURL) {
         },
         
         del: function (uri, headers, callback) {
-            var options = makeOptions("DELETE", baseURL + uri, headers);
+            var options = makeOptions("DELETE", uri, headers, baseURL);
 
             var req = callhttp(options, callback);
             req.end();

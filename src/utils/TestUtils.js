@@ -1,13 +1,7 @@
-var ReqmanConfig = require("../utils/ReqmanConfig");
-
-var config = ReqmanConfig();
+var fs = require("fs");
 
 module.exports = function () {
-    return {
-        getTokenLink: function (token, pagePath) {  	
-        	return config.baseURL + "/apilogin/" + token + ";returnurl=" + encodeURIComponent(pagePath);
-        },
-        
+    return {    
         getUserIDByName: function (userData, userName){
     		var userID = null;
     		if (userData){
@@ -22,5 +16,18 @@ module.exports = function () {
     
     		return userID;
         },
+        downloadFile: function(dataStream, filePath, callback){
+
+            var strmOut = fs.createWriteStream(filePath);
+            
+            dataStream.on('data', function(data) {
+            	strmOut.write(data);
+            }).on('end', function() {
+            	strmOut.end();
+            	if (callback){
+            		callback();
+            	}
+            });
+        }
     };
 };

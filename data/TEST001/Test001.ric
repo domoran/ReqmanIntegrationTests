@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<ImporterConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" AutomaticMode="true" ReplaceControlCharacters="true" IgnoreDrawings="false" Version="2">
+  <Pages>
+    <PdfPage PageNumber="1" Excluded="false" />
+  </Pages>
+  <Nodes>
+    <Start>
+      <Id>82d7699e-b737-4d9a-b245-46693653a7f9</Id>
+      <NodeInformation X="-26" Y="103" />
+      <LanguageKey>de-DE</LanguageKey>
+      <RemoveShadowWords>false</RemoveShadowWords>
+    </Start>
+    <Heading>
+      <Id>e8c6094a-95b3-42f8-9d75-02f032ef1b84</Id>
+      <NodeInformation X="254" Y="103" />
+      <Prefix>true</Prefix>
+      <AutoChapter>true</AutoChapter>
+    </Heading>
+    <Requirement>
+      <Id>8edcac55-dd63-4602-8ade-f977a513e08d</Id>
+      <NodeInformation X="254" Y="198" />
+      <Prefix>false</Prefix>
+    </Requirement>
+    <FontType>
+      <Id>64a64f80-ff8d-41b7-85fb-c68dfb15aed2</Id>
+      <NodeInformation X="814" Y="103" />
+      <Font>Calibri-Light</Font>
+      <FontNameEnable>true</FontNameEnable>
+      <FontSize>15.96</FontSize>
+      <FontSizeEnable>true</FontSizeEnable>
+      <Bold>true</Bold>
+      <Underline xsi:nil="true" />
+      <Strikethrough xsi:nil="true" />
+    </FontType>
+    <RowStartWithNumber>
+      <Id>10f10851-a6b0-4936-bb29-7919b85e8f83</Id>
+      <NodeInformation X="1094" Y="103" />
+    </RowStartWithNumber>
+    <Column>
+      <Id>304913e7-211c-41ce-b754-f709fc03e834</Id>
+      <NodeInformation X="534" Y="103" />
+      <Left>50</Left>
+      <Right>124.56</Right>
+    </Column>
+  </Nodes>
+  <Connections>
+    <Connection Source="82d7699e-b737-4d9a-b245-46693653a7f9" Destination="e8c6094a-95b3-42f8-9d75-02f032ef1b84" SourceKey="Output" DestinationKey="Input" />
+    <Connection Source="82d7699e-b737-4d9a-b245-46693653a7f9" Destination="8edcac55-dd63-4602-8ade-f977a513e08d" SourceKey="Output" DestinationKey="Input" />
+    <Connection Source="e8c6094a-95b3-42f8-9d75-02f032ef1b84" Destination="304913e7-211c-41ce-b754-f709fc03e834" SourceKey="Rule" DestinationKey="Input" />
+    <Connection Source="64a64f80-ff8d-41b7-85fb-c68dfb15aed2" Destination="10f10851-a6b0-4936-bb29-7919b85e8f83" SourceKey="Output" DestinationKey="Input" />
+    <Connection Source="304913e7-211c-41ce-b754-f709fc03e834" Destination="64a64f80-ff8d-41b7-85fb-c68dfb15aed2" SourceKey="Output" DestinationKey="Input" />
+  </Connections>
+  <RequirementRectangleConfig>
+    <DocumentHash>8ddc2b2656ff37b8cd3374ec080f3340</DocumentHash>
+    <RequirementRectangles>
+      <RecognizeRectangle>
+        <Left>88.8239974975586</Left>
+        <Top>85.97003173828125</Top>
+        <Right>100.65392303466797</Right>
+        <Bottom>101.92999267578125</Bottom>
+        <Type>HeadingPrefix</Type>
+        <PageNumber>1</PageNumber>
+        <GroupId>1</GroupId>
+        <ChapterLevel>1</ChapterLevel>
+        <Id>3543652a-8b59-4403-ab34-43234476e7f1</Id>
+      </RecognizeRectangle>
+      <RecognizeRectangle>
+        <Left>105.81999969482422</Left>
+        <Top>84.97003173828125</Top>
+        <Right>228.5733642578125</Right>
+        <Bottom>102.92999267578125</Bottom>
+        <Type>Heading</Type>
+        <PageNumber>1</PageNumber>
+        <GroupId>1</GroupId>
+        <ChapterLevel>1</ChapterLevel>
+        <Id>eb2c346a-d2b5-48ab-93d3-f9efa76c8597</Id>
+      </RecognizeRectangle>
+      <RecognizeRectangle>
+        <Left>69.8239974975586</Left>
+        <Top>127.41998291015625</Top>
+        <Right>501.08126831054688</Right>
+        <Bottom>154.97998046875</Bottom>
+        <Type>None</Type>
+        <PageNumber>1</PageNumber>
+        <GroupId>2</GroupId>
+        <ChapterLevel>1</ChapterLevel>
+        <Id>b8a49170-44c6-4fdd-b9a9-5b6d28f6235e</Id>
+      </RecognizeRectangle>
+    </RequirementRectangles>
+  </RequirementRectangleConfig>
+  <PageSizes>
+    <PageSize Width="596.32" Height="842.92" Rotation="0">
+      <Rectangle Left="35.36000366210942" Top="25.600000000000023" Right="579.36000366210942" Bottom="297.6" />
+    </PageSize>
+  </PageSizes>
+  <DocumentHash>8ddc2b2656ff37b8cd3374ec080f3340</DocumentHash>
+</ImporterConfiguration>

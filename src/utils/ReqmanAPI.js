@@ -96,15 +96,14 @@ module.exports = function (config) {
         	getData("/Document", callback);
         },
         
-        uploadDocument: function (data, callback) {
+        uploadDocument: function (url, callbackURL, projectID, previusID, createJob, callback) {
             var postdata = {
-                "url": data["url"],
-                "project": data["project"],
-                "previousId": data["previousId"] || 0,
-                "createJob": false,
+                "url": url,
+                "callbackUrl": callbackURL,
+                "project": projectID,
+                "previousId": previusID || 0,
+                "createJob": createJob,
             };
-
-            if (data["callbackUrl"]) postdata["callbackUrl"] = data["callbackUrl"];
 
             return postData("/Document", postdata, callback);
         },
@@ -206,6 +205,10 @@ module.exports = function (config) {
             requests.download("/ReqIf/Download/" + exchangeVersionId, callback);
         },
         
+        downloadFile: function (url, callback) {
+            requests.download(url, callback);
+        },
+        
         // User
         getUsers: function (callback){
         	return getData("/User", callback);
@@ -216,10 +219,10 @@ module.exports = function (config) {
         	var testPassword = "1234Ab5678!";
         	var testFirstName = "Max";
         	var testLastName = "Mustermann";
-        	var testEmail = "test@test.com!";
+        	var testEmail = "test@test.com";
         	var testIsActiveDirectoryUser = false;
                 		
-        	var postData = {
+        	var postdata = {
         			  "firstName": firstName,
         			  "lastName": lastName,
         			  "userName": username,
@@ -228,17 +231,17 @@ module.exports = function (config) {
         			  "isActiveDirectoryUser": false
         		};
         	
-        	if (!password) postData["password"] = testPassword;
-        	if (!firstName)	postData["firstName"] = testFirstName;
-        	if (!lastName) postData["lastName"] = testLastName;
-        	if (!email)	postData["email"] = testEmail;
-        	if (isActiveDirectoryUser == null) postData["isActiveDirectoryUser"] = testIsActiveDirectoryUser;
+        	if (!password) postdata["password"] = testPassword;
+        	if (!firstName)	postdata["firstName"] = testFirstName;
+        	if (!lastName) postdata["lastName"] = testLastName;
+        	if (!email)	postdata["email"] = testEmail;
+        	if (isActiveDirectoryUser == null) postdata["isActiveDirectoryUser"] = testIsActiveDirectoryUser;
         	
-        	return postData("/User", postData, callback);
+        	return postData("/User", postdata, callback);
         },
         
         updateUser: function(userId, userName, isDeactivated, firstName, lastName, email, isActiveDirectoryUser, callback){
-        	var putData = {
+        	var putdata = {
       			  "firstName": firstName,
       			  "lastName": lastName,
       			  "userName": username,
@@ -247,7 +250,7 @@ module.exports = function (config) {
       			  "isActiveDirectoryUser": false
         		};
         	
-        	putData("/User/" + userId, putData, callback);
+        	putData("/User/" + userId, putdata, callback);
         },
         
     };

@@ -5,14 +5,18 @@ exports.config = {
   seleniumAddress: 'http://localhost:4445/wd/hub',
 
   suites: {
-    configure: 'src/test/test_configure.js',
+    configure: 'src/test/CONFIGURE.js',
     
     deb: 'src/test/debug.js',
 
     api: 'src/test/test_api.js',
 
     integration: [
-      'src/test/test_pdf_upload_userLogin.js',
+    	'src/test/INT_PREPARATION.js',
+    	'src/test/INT_TEST001.js',
+    	'src/test/INT_TEST002.js',
+//    	'src/test/INT_TEST003.js',
+    	'src/test/INT_TEARDOWN.js',
     ]
   },
 

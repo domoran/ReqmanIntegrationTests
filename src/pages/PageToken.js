@@ -1,8 +1,4 @@
-var ReqmanConfig = require("../utils/ReqmanConfig");
-
-var config = ReqmanConfig();
-
-module.exports = function () {
+module.exports = function (config) {
     var name = $$("input[name=Description]");
     var button = $$("button[type=submit");
 
@@ -39,4 +35,4 @@ module.exports = function () {
         },
 
     };
-}();
+};

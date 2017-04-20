@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<REQ-IF xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <THE-HEADER>
+    <REQ-IF-HEADER IDENTIFIER="_d7b42008-79c0-4897-bd7f-8e200c564c4e">
+      <CREATION-TIME>2017-03-23T16:27:58+01:00</CREATION-TIME>
+      <REQ-IF-TOOL-ID>Em.ReqMan.Core.ReqIf_1.0.0.0</REQ-IF-TOOL-ID>
+      <REQ-IF-VERSION>1.0</REQ-IF-VERSION>
+      <SOURCE-TOOL-ID>Em.ReqMan.Core.ReqIf_1.0.0.0</SOURCE-TOOL-ID>
+      <TITLE>little.pdf_v0</TITLE>
+    </REQ-IF-HEADER>
+  </THE-HEADER>
+  <CORE-CONTENT>
+    <REQ-IF-CONTENT>
+      <DATATYPES>
+        <DATATYPE-DEFINITION-XHTML IDENTIFIER="_acb01ced-40f1-41ac-b181-4232b4da9c7e" LAST-CHANGE="2017-03-23T09:57:30+01:00" LONG-NAME="Text"></DATATYPE-DEFINITION-XHTML>
+      </DATATYPES>
+      <SPEC-TYPES>
+        <SPEC-OBJECT-TYPE IDENTIFIER="_14d05aef-c966-437f-b1a1-693bb0489dc5" LAST-CHANGE="2010-01-01T01:00:00+01:00">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-XHTML IDENTIFIER="_885e7a16-0653-487f-9a2e-f2846fd5cf3f" LAST-CHANGE="2010-01-01T01:00:00+01:00" LONG-NAME="Comment" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-XHTML-REF>_acb01ced-40f1-41ac-b181-4232b4da9c7e</DATATYPE-DEFINITION-XHTML-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-XHTML>
+            <ATTRIBUTE-DEFINITION-XHTML IDENTIFIER="_8892e7d4-0da3-4797-994f-7b9966f7dbfb" LAST-CHANGE="2010-01-01T01:00:00+01:00" LONG-NAME="ReqIF.ChapterName" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-XHTML-REF>_acb01ced-40f1-41ac-b181-4232b4da9c7e</DATATYPE-DEFINITION-XHTML-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-XHTML>
+            <ATTRIBUTE-DEFINITION-XHTML IDENTIFIER="_88faaa7f-1ed0-4d86-81af-3902c25cb98d" LAST-CHANGE="2010-01-01T01:00:00+01:00" LONG-NAME="ReqIF.Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-XHTML-REF>_acb01ced-40f1-41ac-b181-4232b4da9c7e</DATATYPE-DEFINITION-XHTML-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-XHTML>
+            <ATTRIBUTE-DEFINITION-XHTML IDENTIFIER="_88bab1bd-594c-4e14-876e-ddb233eccdb6" LAST-CHANGE="2010-01-01T01:00:00+01:00" LONG-NAME="ReqIF.Text" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-XHTML-REF>_acb01ced-40f1-41ac-b181-4232b4da9c7e</DATATYPE-DEFINITION-XHTML-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-XHTML>
+          </SPEC-ATTRIBUTES>
+        </SPEC-OBJECT-TYPE>
+        <SPECIFICATION-TYPE IDENTIFIER="_d5b92d36-9f11-464a-b995-e3c294d4e76d" LAST-CHANGE="2010-01-01T01:00:00+01:00">
+          <SPEC-ATTRIBUTES>
+          </SPEC-ATTRIBUTES>
+        </SPECIFICATION-TYPE>
+      </SPEC-TYPES>
+      <SPEC-OBJECTS>
+        <SPEC-OBJECT IDENTIFIER="_a96ba8e0-6485-4abd-ab43-dc42202efb8a" LAST-CHANGE="2017-03-23T16:28:37+01:00">
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>_14d05aef-c966-437f-b1a1-693bb0489dc5</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+          <VALUES>
+            <ATTRIBUTE-VALUE-XHTML>
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-XHTML-REF>_8892e7d4-0da3-4797-994f-7b9966f7dbfb</ATTRIBUTE-DEFINITION-XHTML-REF>
+              </DEFINITION>
+              <THE-VALUE>
+                <xhtml:div>Ich bin ein Heading</xhtml:div>
+              </THE-VALUE>
+            </ATTRIBUTE-VALUE-XHTML>
+            <ATTRIBUTE-VALUE-XHTML>
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-XHTML-REF>_88faaa7f-1ed0-4d86-81af-3902c25cb98d</ATTRIBUTE-DEFINITION-XHTML-REF>
+              </DEFINITION>
+              <THE-VALUE>
+                <xhtml:div>1.</xhtml:div>
+              </THE-VALUE>
+            </ATTRIBUTE-VALUE-XHTML>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="_7ddcd4a4-0e8f-44d1-9c2f-88b1c82d19a1" LAST-CHANGE="2017-03-23T16:28:37+01:00">
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>_14d05aef-c966-437f-b1a1-693bb0489dc5</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+          <VALUES>
+            <ATTRIBUTE-VALUE-XHTML>
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-XHTML-REF>_88bab1bd-594c-4e14-876e-ddb233eccdb6</ATTRIBUTE-DEFINITION-XHTML-REF>
+              </DEFINITION>
+              <THE-VALUE>
+                <xhtml:div>Wenn du mit 23 Menschen in einem Raum bist, gibt es eine 50 prozentige Chance, dass zwei am gleichen Tag Geburtstag haben.</xhtml:div>
+              </THE-VALUE>
+            </ATTRIBUTE-VALUE-XHTML>
+          </VALUES>
+        </SPEC-OBJECT>
+      </SPEC-OBJECTS>
+      <SPEC-RELATIONS />
+      <SPECIFICATIONS>
+        <SPECIFICATION IDENTIFIER="_9b1bbc48-ebdc-4ff6-868b-e8367e76da43" LAST-CHANGE="0001-01-01T01:00:00+01:00" LONG-NAME="little.pdf">
+          <TYPE>
+            <SPECIFICATION-TYPE-REF>_d5b92d36-9f11-464a-b995-e3c294d4e76d</SPECIFICATION-TYPE-REF>
+          </TYPE>
+          <CHILDREN>
+            <SPEC-HIERARCHY IDENTIFIER="_a5efbaae-254b-470e-87a0-a69f45b52318" LAST-CHANGE="2017-03-23T16:28:37+01:00">
+              <OBJECT>
+                <SPEC-OBJECT-REF>_a96ba8e0-6485-4abd-ab43-dc42202efb8a</SPEC-OBJECT-REF>
+              </OBJECT>
+              <CHILDREN>
+                <SPEC-HIERARCHY IDENTIFIER="_65b977f7-7b3c-41e2-8e13-407eb104e204" LAST-CHANGE="2017-03-23T16:28:37+01:00">
+                  <OBJECT>
+                    <SPEC-OBJECT-REF>_7ddcd4a4-0e8f-44d1-9c2f-88b1c82d19a1</SPEC-OBJECT-REF>
+                  </OBJECT>
+                  <CHILDREN>
+                  </CHILDREN>
+                </SPEC-HIERARCHY>
+              </CHILDREN>
+            </SPEC-HIERARCHY>
+          </CHILDREN>
+        </SPECIFICATION>
+      </SPECIFICATIONS>
+    </REQ-IF-CONTENT>
+  </CORE-CONTENT>
+</REQ-IF>

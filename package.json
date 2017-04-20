@@ -18,6 +18,7 @@
     "debug_p": "./node_modules/.bin/protractor test_config.js --suite deb",
     "config": "./node_modules/.bin/protractor test_config.js --suite configure",
     "tests": "./node_modules/.bin/protractor test_config.js --suite api,integration",
+    "full": "./node_modules/.bin/protractor test_config.js --suite configure,api,integration",
     "lint": "./node_modules/.bin/eslint --fix src"
   },
   "repository": {

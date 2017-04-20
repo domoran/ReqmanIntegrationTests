@@ -55,6 +55,7 @@ module.exports = function () {
                     requestData = JSON.parse(requestData);
                 }
                 server.urlCallbacks[uri](req.headers, requestData);
+                res.end('ok');
             }
         });
 
