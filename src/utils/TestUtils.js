@@ -1,4 +1,5 @@
-var fs = require("fs");
+var fs = require("fs"),
+	unzip = require("unzip");
 
 module.exports = function () {
     return {    
@@ -23,11 +24,19 @@ module.exports = function () {
             dataStream.on('data', function(data) {
             	strmOut.write(data);
             }).on('end', function() {
-            	strmOut.end();
-            	if (callback){
-            		callback();
-            	}
+            	if (callback)
+            		strmOut.end(callback);
+            	else
+            		strmOut.end();
             });
+        },
+        unzipFile: function(zipFilePath, extractionPath, callback){
+
+        	fs.createReadStream(zipFilePath).pipe(unzip.Extract({ path: extractionPath })).on('close', callback);
+        },
+        endsWith: function (str, suffix) {
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
         }
+        
     };
 };

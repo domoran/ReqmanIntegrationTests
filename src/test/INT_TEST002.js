@@ -36,13 +36,13 @@ describe("TEST002: Excel Template Export:", function() {
     var FILEWASEXPORTED_MESSAGE = "File was sent to MyDocumentSystem";
     var FILEEXPORT_CALLBACK = "/filecallback";
 
-    beforeEach(function () {
-        server = createServer().listen(WEBSERVER_PORT);
-    });
-
-    afterEach(function () {
-        if (server != null) server.close();
-    });
+//    beforeEach(function () {
+//        server = createServer().listen(WEBSERVER_PORT);
+//    });
+//
+//    afterEach(function () {
+//        if (server != null) server.close();
+//    });
     
     beforeAll(function(){
     	console.log("\nStart TEST002");
@@ -53,6 +53,14 @@ describe("TEST002: Excel Template Export:", function() {
     	config = ReqmanConfig();
     	api = ReqmanAPI(config);
     	projectID = config.get("PROJECTID"); 
+    	server = createServer().listen(WEBSERVER_PORT);
+    });
+    
+    afterAll(function (done) {
+        if (server != null) 
+        	server.close(done);
+        else
+        	done();
     });
     
 	//Prepare environment   
@@ -88,7 +96,9 @@ describe("TEST002: Excel Template Export:", function() {
             expect(error).toEqual(null);
             expect(data).not.toEqual(null);
             expect(data.valid).toBe(true);
-            expect(data.contentType.toLowerCase()).toEqual("reqif");
+            expect(data.contentType).not.toEqual(null);
+            if (data.contentType)
+            	expect(data.contentType.toLowerCase()).toEqual("reqif");
             done();
             browser.ignoreSynchronization = false;
         });
@@ -151,7 +161,7 @@ describe("TEST002: Excel Template Export:", function() {
         PageExportDocument(documentExportLink).exportExcelCommentSheet(EXCELEXPORTNAME, EXCELEXPORTTEMPLATENAME);
         
         var exportFinishedPopup = element(by.cssContainingText('p', FILEWASEXPORTED_MESSAGE));
-        browser.wait(EC.presenceOf(exportFinishedPopup), 20000);
+        browser.wait(EC.presenceOf(exportFinishedPopup), 35000);
         expect(exportFinishedPopup.isPresent()).toBe(true);
     }, 35000);
     

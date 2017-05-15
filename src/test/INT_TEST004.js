@@ -12,7 +12,7 @@ var createServer = require("../utils/webserver"),
 	fs = require("fs"),
 	path = require("path"),
 	EC = protractor.ExpectedConditions,
-	data_directory = path.normalize(path.join(__dirname, "..", "..", "data/TEST001"));
+	data_directory = path.normalize(path.join(__dirname, "..", "..", "data/TEST004"));
 
 var config;
 var api;
@@ -20,7 +20,8 @@ var server = null;
 
 describe("TEST004: Reimport changed PDF:", function() {
 
-	var projectID = null,  
+	var projectID = null, 
+	previousTestDocId = null;
  	documentID = null,
     documentLink = null,
     documentDetailPage = null,
@@ -50,7 +51,16 @@ describe("TEST004: Reimport changed PDF:", function() {
     	
     	config = ReqmanConfig();
     	api = ReqmanAPI(config);
-    	projectID = config.get("PROJECTID");    	
+    	previousTestDocId = config.get(TESTDOCUMENTID_CONFIGNAME);
+    	projectID = config.get("PROJECTID"); 
+    	server = createServer().listen(WEBSERVER_PORT);
+    });
+    
+    afterAll(function (done) {
+        if (server != null) 
+        	server.close(done);
+        else
+        	done();
     });
 
     // Prepare environment
@@ -86,19 +96,22 @@ describe("TEST004: Reimport changed PDF:", function() {
             expect(error).toEqual(null);
             expect(data).not.toEqual(null);
             expect(data.valid).toBe(true);
-            expect(data.contentType.toLowerCase()).toEqual("pdf");
+            expect(data.contentType).not.toEqual(null);
+            if (data.contentType)
+            	expect(data.contentType.toLowerCase()).toEqual("pdf");
             done();
             browser.ignoreSynchronization = false;
         });
     });
     
     it("Should be possible to upload a document via API", function (done) {
-        
+    	if (!previousTestDocId) { pending(); return; }
+    	
         var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST004/" + TESTFILENAME,
         	callbackUrl = "http://localhost:" + WEBSERVER_PORT + "/callback",
         	projectId = projectID,
         	createJob = false;
-        	prevousID = config.get(TESTDOCUMENTID_CONFIGNAME);
+        	prevousID = previousTestDocId;
         	
         browser.ignoreSynchronization = true;
         api.uploadDocument(url, callbackUrl, projectId, prevousID, createJob, function (error, data) {
@@ -131,7 +144,6 @@ describe("TEST004: Reimport changed PDF:", function() {
         if (!projectID) { pending(); return; }
         
         var absolutePath = path.join(data_directory, PROFILEFILENAME);
-
         documentDetailPage.upload(absolutePath, PROFILENAME, done);
     });
 
@@ -141,7 +153,7 @@ describe("TEST004: Reimport changed PDF:", function() {
         // Wait for Reqman callback after activating scan, to assure that document is finished
         server.onURI("/callback", function (headers, data) {
         	expect(data.State).toBe("Finished");
-            
+        	browser.ignoreSynchronization = false;
             documentScanned = true;
             done();
         });
@@ -149,23 +161,51 @@ describe("TEST004: Reimport changed PDF:", function() {
         documentDetailPage.scanWithProjectProfile(PROFILENAME);  
     }, 25000);
 
-    it("Should be possible to view the scanned document in Reqman", function (done) {
+    it("Should be possible to check the new created document version", function (done) {
         if (!documentID || !userToken || !documentScanned) { pending(); return; }
 
+        browser.ignoreSynchronization = true;
+        var regexDocumentId = new RegExp("Document-Id:\s*\d*");
+        
         api.getDocument(documentID, function (error, data) {
             expect(error).toEqual(null);
             expect(data).not.toEqual(null);
             expect(data.state).toBe("Finished");
+            expect(data.log).not.toBe(null);
             
-        	browser.ignoreSynchronization = true;
-            documentDetailPage.visitScannedDocument(function(){
+        	var newDocumentLog = data.log;
+        	var newDocumentDocId = newDocumentLog.match(regexDocumentId);
+        	
+        	expect(newDocumentDocId).not.toBe(null);
+        	expect(newDocumentDocId.length).toBe(1);
+        	
+        	newDocumentDocId = newDocumentDocId[0].match(/\d*/);
+        	expect(newDocumentDocId).not.toBe(null);
+        	expect(newDocumentDocId.length).toBe(1);
+        	newDocumentDocId = newDocumentDocId[0];
+        	
+        	api.getDocument(config.get(TESTDOCUMENTID_CONFIGNAME), function (error2, data2) {
+                expect(error2).toEqual(null);
+                expect(data2).not.toEqual(null);
+                expect(data2.state).toBe("Finished");
+                expect(data2.log).not.toBe(null);
+                
+            	var oldDocumentLog = data2.log;
+            	var oldDocumentDocId = newDocumentLog.match(regexDocumentId);
             	
-            	// TODO: Überprüfe Dokumentinhalte
-            	var heading = element(by.xpath("//div[normalize-space(text())='Ich bin ein Heading']"));
-            	expect(heading.isPresent()).toBe(true);
-    			
-    			done();
-    			browser.ignoreSynchronization = false;
+            	expect(oldDocumentDocId).not.toBe(null);
+            	expect(oldDocumentDocId.length).toBe(1);
+            	
+            	oldDocumentDocId = oldDocumentDocId[0].match(/\d*/);
+            	expect(oldDocumentDocId).not.toBe(null);
+            	expect(oldDocumentDocId.length).toBe(1);
+            	oldDocumentDocId = oldDocumentDocId[0];
+            	
+            	
+            	// Both document Ids must be the same, if the new document is created as a new version of the old document
+            	expect(newDocumentDocId).toBe(oldDocumentDocId);
+            	browser.ignoreSynchronization = false;
+            	done();
             });
         });
     });
@@ -184,8 +224,7 @@ describe("TEST004: Reimport changed PDF:", function() {
         if (!exchangeVersion) { pending(); return; }
         api.downloadReqIF(exchangeVersion, function (error, datastream) {
             expect(error).toEqual(null);
-            var reqIfFileName = OUTPUTFILENAME;
-            var absolutePath = path.join(data_directory + "/../Download", reqIfFileName);
+            var absolutePath = path.join(data_directory + "/../Download", OUTPUTFILENAME);
             TestUtils().downloadFile(datastream, absolutePath, function(){
             	// Check if ReqIf file exists
             	fs.exists(absolutePath, function(exists) {

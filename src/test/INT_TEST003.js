@@ -12,7 +12,6 @@ var createServer = require("../utils/webserver"),
 	TestUtils = require("../utils/TestUtils"),
 	fs = require("fs"),
 	path = require("path"),
-	
 	EC = protractor.ExpectedConditions,
 	data_directory = path.normalize(path.join(__dirname, "..", "..", "data/TEST003"));
 
@@ -31,20 +30,19 @@ describe("TEST003: Excel Template Reimport:", function() {
     var downloadLink = null;
     var excelExportName = null;
     
- // Test constants
-	var TESTFILENAME = "TEST003.xlsx";
-	var EXCELEXPORTNAME = "TEST004.zip";
-	var EXCELEXPORTTEMPLATENAME = "RequirementReportTemplate";
-    var FILEWASEXPORTED_MESSAGE = "File was sent to MyDocumentSystem";
-    var FILEEXPORT_CALLBACK = "/filecallback";
+    // Test constants
+	var TESTFILENAME = null;
+	var OUTPUTFILENAME = "TEST003.reqifz";
+	var EXCELZIPFILENAME = "TEST002.zip";
 
-    beforeEach(function () {
-        server = createServer().listen(WEBSERVER_PORT);
-    });
 
-    afterEach(function () {
-        if (server != null) server.close();
-    });
+//    beforeEach(function () {
+//        server = createServer().listen(WEBSERVER_PORT);
+//    });
+//
+//    afterEach(function () {
+//        if (server != null) server.close();
+//    });
     
     beforeAll(function(){
     	console.log("\nStart TEST003");
@@ -55,6 +53,14 @@ describe("TEST003: Excel Template Reimport:", function() {
     	config = ReqmanConfig();
     	api = ReqmanAPI(config);
     	projectID = config.get("PROJECTID"); 
+    	server = createServer().listen(WEBSERVER_PORT);
+    });
+    
+    afterAll(function (done) {
+        if (server != null) 
+        	server.close(done);
+        else
+        	done();
     });
     
 	//Prepare environment   
@@ -81,10 +87,43 @@ describe("TEST003: Excel Template Reimport:", function() {
 		
 	}, 30000);
 	
-	//TODO: Anpassung der DocumentId im TEST003.xlsx-File
+	it("PREPARATION: Should be able to extract the TEST001 output in the TEST004 folder", function (done) {
+		
+		var zipFilePath = path.join(data_directory + "/../Download", EXCELZIPFILENAME);
+		var extractionPath = data_directory;
+		
+		fs.exists(zipFilePath, function(exists) {
+    		expect(exists).toBe(true);
+    		
+    		if (exists){
+    			TestUtils().unzipFile(zipFilePath, extractionPath, function(){
+        			var counter = 0;
+        			fs.readdir(extractionPath, function(err, files){
+        				expect(err).toBe(null);
+        				files.forEach(function(file){
+        					if (TestUtils().endsWith(file, "xlsx")){
+        						counter++;
+        						TESTFILENAME = file;
+        					}
+        				});
+        				expect(counter).toBe(1);
+        				done();
+        			});
+        		});	
+    		}		
+    	});
+		
+		
+	}, 30000);
+	
+	//TODO: Kopieren und entpacken des Excel Exports aus TEST002
+	
+	//TODO: Anpassung des TEST003.xlsx-Files auf die gewünschten neuen Einträge
     
     // Start test actions
     it("Should be possible to validate Excel comment file", function (done) {
+    	if (!TESTFILENAME) { pending(); return; }
+    	
         var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + TESTFILENAME;
 
         browser.ignoreSynchronization = true;
@@ -92,13 +131,16 @@ describe("TEST003: Excel Template Reimport:", function() {
             expect(error).toEqual(null);
             expect(data).not.toEqual(null);
             expect(data.valid).toBe(true);
-            expect(data.contentType.toLowerCase()).toEqual("excelreport");
+            expect(data.contentType).not.toEqual(null);
+            if (data.contentType)
+            	expect(data.contentType.toLowerCase()).toEqual("excelreport");
             done();
             browser.ignoreSynchronization = false;
         });
     });
     
     it("Should be possible to upload a Excel comment document via API", function (done) {
+    	if (!TESTFILENAME) { pending(); return; }
 
         var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + TESTFILENAME,
 		callbackUrl = "http://localhost:" + WEBSERVER_PORT + "/callback",
@@ -124,7 +166,8 @@ describe("TEST003: Excel Template Reimport:", function() {
 	    });
 	}, 25000);
            
-//    it("Should be possible to visit the export page", function (done) {
+    //TODO: Check if changes appear in GUI
+//    it("Should be possible to visit the document page", function (done) {
 //        if (!documentID || !userToken || !documentScanned || !documentExportLink) { pending(); return; }
 //        
 //        var documentDetailPage = PageDocumentDetails(documentLink, config);
@@ -139,71 +182,31 @@ describe("TEST003: Excel Template Reimport:", function() {
 //        });
 //    });
     
-    it("Should be possible to visit the export page", function (done) {
-        if (!documentID || !userToken || !documentScanned || !documentExportLink) { pending(); return; }
-        
-        server.onURI("/filecallback", function (headers, data) {
-        	expect(data).not.toBe(null);
-        	expect(data.Id).not.toBe(null);
-        	expect(data.Url).not.toBe(null);
-            
-        	downloadLink = data.Url;
-        	console.log(downloadLink);
-        	
+    it("Should be possible to trigger ReqIF Creation for the scanned document", function (done) {
+        if (!documentScanned) { pending(); return; }
+
+        api.createReqIFDownload(documentID, function (error, data) {
+            expect(error).toEqual(null);
+            exchangeVersion = data;
             done();
         });
-        
-        excelExportName = "ReqMan-Test.zip";
-        PageExportDocument(documentExportLink).exportExcelCommentSheet(excelExportName, "RequirementReportTemplate");
-        
-        var exportFinishedHeading = element(by.cssContainingText('h3',"Exportieren der Kommentare nach Excel ist beendet."));
-        browser.wait(EC.presenceOf(exportFinishedHeading), 20000);
-        expect(exportFinishedHeading.isPresent()).toBe(true);
-    }, 35000);
-    
-    it("Should be possible to download the excel file", function (done) {
-        if (!downloadLink) { pending(); return; }
+    });
 
-        api.downloadFile(downloadLink, function (error, datastream) {
+    it("Should be possible to download the created ReqIF file", function (done) {
+        if (!exchangeVersion) { pending(); return; }
+        api.downloadReqIF(exchangeVersion, function (error, datastream) {
             expect(error).toEqual(null);
-
-            var absolutePath = path.join(data_directory + "/../Download", excelExportName);
-            var strmOut = fs.createWriteStream(absolutePath);
-            datastream.on("data", function (chunk) { strmOut.write(chunk);  });
-            datastream.on("end", function () { 
-            	strmOut.close();
-            	// Check if excel file exists
+            var absolutePath = path.join(data_directory + "/../Download", OUTPUTFILENAME);
+            TestUtils().downloadFile(datastream, absolutePath, function(){
+            	// Check if ReqIf file exists
             	fs.exists(absolutePath, function(exists) {
             		expect(exists).toBe(true);
             		done();
             	});
             });
         });
-    }, 35000);
+    });
     
-    
-    
-//    it("Should be possible export an excel file from the document", function (done) {
-//        if (!documentID || !userToken || !documentScanned) { pending(); return; }
-//        
-//        browser.ignoreSynchronization = true;
-//        api.getDocument(documentID, function (error, data) {
-//            expect(error).toEqual(null);
-//            expect(data.state).toBe("Finished");
-//            expect(data.link).toContain("http");
-//            
-//            documentDetailPage = PageDocumentDetails(data.link);
-//            
-//            documentDetailPage.visitScannedDocument(function(){
-//            	
-//            	var heading = element(by.xpath("//div[normalize-space(text())='Ich bin ein Heading']"));
-//            	expect(heading.isPresent()).toBe(true);
-//    			
-//    			done();
-//    			browser.ignoreSynchronization = false;
-//            });
-//        });
-//    });
 });
 
 describe("Logout", function () {

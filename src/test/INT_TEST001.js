@@ -36,13 +36,13 @@ describe("TEST001: Create ReqIF from PDF:", function() {
 	var TESTDOCUMENTID_CONFIGNAME = "TEST001DOCID";
 	
 	
-    beforeEach(function () {
-        server = createServer().listen(WEBSERVER_PORT);
-    });
+//    beforeEach(function () {
+//        server = createServer().listen(WEBSERVER_PORT);
+//    });
 
-    afterEach(function () {
-        if (server != null) server.close();
-    });
+//    afterEach(function () {
+//        if (server != null) server.close();
+//    });
     
     beforeAll(function(){
     	console.log("\nStart TEST001");
@@ -51,7 +51,15 @@ describe("TEST001: Create ReqIF from PDF:", function() {
     	
     	config = ReqmanConfig();
     	api = ReqmanAPI(config);
-    	projectID = config.get("PROJECTID");    	
+    	projectID = config.get("PROJECTID");
+    	server = createServer().listen(WEBSERVER_PORT);
+    });
+    
+    afterAll(function (done) {
+        if (server != null) 
+        	server.close(done);
+        else
+        	done();
     });
 
     // Prepare environment
@@ -87,7 +95,9 @@ describe("TEST001: Create ReqIF from PDF:", function() {
             expect(error).toEqual(null);
             expect(data).not.toEqual(null);
             expect(data.valid).toBe(true);
-            expect(data.contentType.toLowerCase()).toEqual("pdf");
+            expect(data.contentType).not.toEqual(null);
+            if (data.contentType)
+            	expect(data.contentType.toLowerCase()).toEqual("pdf");
             done();
             browser.ignoreSynchronization = false;
         });
@@ -105,6 +115,7 @@ describe("TEST001: Create ReqIF from PDF:", function() {
             expect(error).toEqual(null);
             documentID = data;
             config.set(TESTDOCUMENTID_CONFIGNAME, documentID);
+            config.write();
             done();
             browser.ignoreSynchronization = false;
         });
@@ -142,13 +153,13 @@ describe("TEST001: Create ReqIF from PDF:", function() {
         // Wait for Reqman callback after activating scan, to assure that document is finished
         server.onURI("/callback", function (headers, data) {
         	expect(data.State).toBe("Finished");
-
+        	browser.ignoreSynchronization = false;
             documentScanned = true;
             done();
         });
         
         documentDetailPage.scanWithProjectProfile(PROFILENAME);  
-    }, 25000);
+    }, 30000);
 
     it("Should be possible to view the scanned document in Reqman", function (done) {
         if (!documentID || !userToken || !documentScanned) { pending(); return; }
@@ -161,7 +172,7 @@ describe("TEST001: Create ReqIF from PDF:", function() {
         	browser.ignoreSynchronization = true;
             documentDetailPage.visitScannedDocument(function(){
             	
-            	var heading = element(by.xpath("//div[normalize-space(text())='Ich bin ein Heading']"));
+            	var heading = element(by.xpath("//div[.='Ich bin ein Heading']"));
             	expect(heading.isPresent()).toBe(true);
     			
     			done();
@@ -184,8 +195,7 @@ describe("TEST001: Create ReqIF from PDF:", function() {
         if (!exchangeVersion) { pending(); return; }
         api.downloadReqIF(exchangeVersion, function (error, datastream) {
             expect(error).toEqual(null);
-            var reqIfFileName = OUTPUTFILENAME;
-            var absolutePath = path.join(data_directory + "/../Download", reqIfFileName);
+            var absolutePath = path.join(data_directory + "/../Download", OUTPUTFILENAME);
             TestUtils().downloadFile(datastream, absolutePath, function(){
             	// Check if ReqIf file exists
             	fs.exists(absolutePath, function(exists) {

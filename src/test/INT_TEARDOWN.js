@@ -42,3 +42,14 @@ describe("TEARDOWN:", function() {
     	PageCompanyManagement(config).deleteCompany(config.get("COMPANYID"));
     }); 
 });
+
+describe("Logout", function () {
+	
+	beforeAll(function(){
+    	browser.manage().timeouts().setScriptTimeout(60000);
+    });
+	
+	it("Logout", function () {
+		PageLogin(config).logout();
+	});
+});

@@ -30,6 +30,8 @@ module.exports = function () {
         }
 
         var uri = url.parse(req.url).pathname;
+        
+//        console.log("URI: " + uri);
 
       // If no URI is passed or the root is queried return a hello world html page
         if (!uri || uri == "/") {
@@ -44,6 +46,8 @@ module.exports = function () {
         });
 
         var hasURICallback = !!server.urlCallbacks[uri];
+        
+//        console.log("HasURICallback: " + hasURICallback);
 
         req.on("end", function () {
             if (LOGREQUESTS) {
@@ -54,7 +58,9 @@ module.exports = function () {
                 if (req.headers["content-type"] && req.headers["content-type"].indexOf("/json") >= 0) {
                     requestData = JSON.parse(requestData);
                 }
+//                console.log("Kurz vor Callback");
                 server.urlCallbacks[uri](req.headers, requestData);
+                server.urlCallbacks[uri] = null;
                 res.end('ok');
             }
         });
@@ -78,8 +84,10 @@ module.exports = function () {
                 fileStream.pipe(res);
             }); //end path.exists
         }
+        else{
+        	console.log(server.urlCallbacks);
+        }
     });
-
     server.urlCallbacks = {};
     server.onURI        = function (uri, callback) { server.urlCallbacks[uri] = callback; };
     return server;
