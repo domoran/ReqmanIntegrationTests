@@ -17,9 +17,9 @@ exports.config = {
     	'src/test/INT_PREPARATION.js',
 //    	'src/test/INT_TEST001.js',
     	'src/test/INT_TEST002.js',
-//    	'src/test/INT_TEST003.js',
+    	'src/test/INT_TEST003.js',
 //    	'src/test/INT_TEST004.js',
-//    	'src/test/INT_TEARDOWN.js',
+    	'src/test/INT_TEARDOWN.js',
     ]
   },
 

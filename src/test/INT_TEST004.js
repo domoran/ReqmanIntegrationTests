@@ -58,7 +58,7 @@ describe("TEST004: Reimport changed PDF:", function() {
     
     afterAll(function (done) {
         if (server != null) 
-        	server.close(done);
+        	server.closeNow(done);
         else
         	done();
     });

@@ -10,6 +10,7 @@ var createServer = require("../utils/webserver"),
 	ReqmanConfig =  require("../utils/ReqmanConfig"),
 	ReqmanAPI = require("../utils/ReqmanAPI"),
 	TestUtils = require("../utils/TestUtils"),
+	CommentarySheetHandler = require("../utils/CommentarySheetHandler"),
 	fs = require("fs"),
 	path = require("path"),
 	EC = protractor.ExpectedConditions,
@@ -34,6 +35,7 @@ describe("TEST003: Excel Template Reimport:", function() {
 	var TESTFILENAME = null;
 	var OUTPUTFILENAME = "TEST003.reqifz";
 	var EXCELZIPFILENAME = "TEST002.zip";
+	var MANIPULATEDEXCELFILENAME = "TEST003_MODIFIED.xlsx"
 
 
 //    beforeEach(function () {
@@ -58,7 +60,7 @@ describe("TEST003: Excel Template Reimport:", function() {
     
     afterAll(function (done) {
         if (server != null) 
-        	server.close(done);
+        	server.closeNow(done);
         else
         	done();
     });
@@ -87,44 +89,80 @@ describe("TEST003: Excel Template Reimport:", function() {
 		
 	}, 30000);
 	
-	it("PREPARATION: Should be able to extract the TEST001 output in the TEST004 folder", function (done) {
+//	it("PREPARATION: Should be able to extract the TEST002 output in the TEST003 folder", function (done) {
+//		
+//		var zipFilePath = path.join(data_directory + "/../Download", EXCELZIPFILENAME);
+//		var extractionPath = data_directory;
+//		
+//		fs.exists(zipFilePath, function(exists) {
+//    		expect(exists).toBe(true);
+//    		
+//    		if (exists){
+//    			TestUtils().unzipFile(zipFilePath, extractionPath, function(){
+//        			var counter = 0;
+//        			fs.readdir(extractionPath, function(err, files){
+//        				expect(err).toBe(null);
+//        				files.forEach(function(file){
+//        					if (TestUtils().endsWith(file, "xlsx")){
+//        						counter++;
+//        						TESTFILENAME = file;
+//        					}
+//        				});
+//        				expect(counter).toBe(1);
+//        				done();
+//        			});
+//        		});	
+//    		}		
+//    	});
+//		
+//		
+//	}, 30000);
+	
+	it("PREPARATION: Should be able to find extracted excel file in the TEST003 folder", function (done) {
 		
-		var zipFilePath = path.join(data_directory + "/../Download", EXCELZIPFILENAME);
-		var extractionPath = data_directory;
-		
-		fs.exists(zipFilePath, function(exists) {
-    		expect(exists).toBe(true);
-    		
-    		if (exists){
-    			TestUtils().unzipFile(zipFilePath, extractionPath, function(){
-        			var counter = 0;
-        			fs.readdir(extractionPath, function(err, files){
-        				expect(err).toBe(null);
-        				files.forEach(function(file){
-        					if (TestUtils().endsWith(file, "xlsx")){
-        						counter++;
-        						TESTFILENAME = file;
-        					}
-        				});
-        				expect(counter).toBe(1);
-        				done();
-        			});
-        		});	
-    		}		
-    	});
-		
-		
+		var counter = 0;
+		fs.readdir(data_directory, function(err, files){
+			expect(err).toBe(null);
+			files.forEach(function(file){
+				if (TestUtils().endsWith(file, "xlsx")){
+					counter++;
+					TESTFILENAME = file;
+				}
+			});
+			expect(counter).toBe(1);
+			done();
+		});
 	}, 30000);
 	
-	//TODO: Kopieren und entpacken des Excel Exports aus TEST002
-	
-	//TODO: Anpassung des TEST003.xlsx-Files auf die gewünschten neuen Einträge
-    
+	it("PREPARATION: Should be able to manipulate the excel file", function (done) {
+		if (!TESTFILENAME) { pending(); return; }
+		
+		var excelFilePath = path.join(data_directory, TESTFILENAME);
+		
+		var comSheet = CommentarySheetHandler(excelFilePath);
+    	
+    	browser.wait(comSheet.isWorkbookReady).then(function () {	
+        	
+    		// Change Text of Heading
+    		comSheet.changeValueOfEntityByGivenValue("Ich bin ein neues Heading", "Ich bin ein Heading");
+    		
+    		// Add new Heading
+    		comSheet.addHeading("2", "Added Heading", 7);
+    		
+    		// Add new Requirement
+    		comSheet.addRequirement("2", "Added Requirement", 8);
+    		
+    		// Save in new Excel File
+    		var newExcelFilePath = path.join(data_directory, MANIPULATEDEXCELFILENAME);
+        	comSheet.saveFile(newExcelFilePath, done);
+        });		
+	}, 30000);
+		    
     // Start test actions
     it("Should be possible to validate Excel comment file", function (done) {
     	if (!TESTFILENAME) { pending(); return; }
     	
-        var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + TESTFILENAME;
+        var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + MANIPULATEDEXCELFILENAME;
 
         browser.ignoreSynchronization = true;
         api.checkFile(url, function (error, data) {
@@ -142,7 +180,7 @@ describe("TEST003: Excel Template Reimport:", function() {
     it("Should be possible to upload a Excel comment document via API", function (done) {
     	if (!TESTFILENAME) { pending(); return; }
 
-        var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + TESTFILENAME,
+        var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + MANIPULATEDEXCELFILENAME,
 		callbackUrl = "http://localhost:" + WEBSERVER_PORT + "/callback",
 		projectId = projectID,
 		createJob = true;

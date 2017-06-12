@@ -10,6 +10,7 @@ var createServer = require("../utils/webserver"),
 	ReqmanConfig =  require("../utils/ReqmanConfig"),
 	ReqmanAPI = require("../utils/ReqmanAPI"),
 	TestUtils = require("../utils/TestUtils"),
+	CommentarySheetHandler = require("../utils/CommentarySheetHandler"),
 	fs = require("fs"),
 	path = require("path"),
 	
@@ -28,6 +29,7 @@ describe("TEST002: Excel Template Export:", function() {
     var documentScanned = false;
     var userToken = null;
     var downloadLink = null;
+    var excelFileName = null;
     
     // Test constants
 	var TESTFILENAME = "TEST002.reqifz";
@@ -58,7 +60,7 @@ describe("TEST002: Excel Template Export:", function() {
     
     afterAll(function (done) {
         if (server != null) 
-        	server.close(done);
+        	server.closeNow(done);
         else
         	done();
     });
@@ -165,7 +167,7 @@ describe("TEST002: Excel Template Export:", function() {
         expect(exportFinishedPopup.isPresent()).toBe(true);
     }, 35000);
     
-    it("Should be possible to download the excel file", function (done) {
+    it("Should be possible to download the excel (zip) file", function (done) {
         if (!downloadLink) { pending(); return; }
 
         api.downloadFile(downloadLink, function (error, datastream) {
@@ -180,6 +182,55 @@ describe("TEST002: Excel Template Export:", function() {
             		done();
             	});
             });
+        });
+    }, 35000);
+    
+    
+    it("Should be able to extract the Zip-File in the TEST003 folder", function (done) {
+		
+		var zipFilePath = path.join(data_directory + "/../Download", EXCELEXPORTNAME);
+		var extractionPath = path.normalize(path.join(__dirname, "..", "..", "data/TEST003"));
+		
+		fs.exists(zipFilePath, function(exists) {
+    		expect(exists).toBe(true);
+    		
+    		if (exists){
+    			TestUtils().unzipFile(zipFilePath, extractionPath, function(){
+        			var counter = 0;
+        			fs.readdir(extractionPath, function(err, files){
+        				expect(err).toBe(null);
+        				files.forEach(function(file){
+        					if (TestUtils().endsWith(file, "xlsx")){
+        						counter++;
+        						excelFileName = file;
+        					}
+        				});
+        				expect(counter).toBe(1);
+        				done();
+        			});
+        		});	
+    		}		
+    	});
+		
+		
+	}, 30000);
+
+    it("Should be possible to check the content of the excel file", function () {
+        if (!excelFileName) { pending(); return; }
+
+        var absolutePath = path.join(path.normalize(path.join(__dirname, "..", "..", "data/TEST003")), excelFileName);
+        
+        var comHandler = CommentarySheetHandler(absolutePath);
+        
+        browser.wait(comHandler.isWorkbookReady).then(function () {	
+        	 var jsonOfFile = comHandler.getJSONData(true);
+             
+             var contentToBe = [
+             		["1.","1","Heading","","Ich bin ein Heading","","","","","",""],
+             		["","1","Requirement","","Wenn du mit 23 Menschen in einem Raum bist, gibt es eine 50 prozentige Chance, dass zwei am gleichen Tag Geburtstag haben.","","","","","",""]
+             	];
+             
+             expect(jsonOfFile).toEqual(JSON.stringify(contentToBe));
         });
     }, 35000);
 });

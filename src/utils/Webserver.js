@@ -21,9 +21,27 @@ var mimeTypes = {
     "js": "text/javascript",
     "css": "text/css"};
 
+var sockets = {};
+
 module.exports = function () {
     var server = http.createServer(function(req, res) {
 
+    	//Maintain a hash of all connected sockets
+    	var nextSocketId = 0;
+    	sockets = {};
+    	
+    	server.on('connection', function (socket) {
+			// Add a newly connected socket
+			var socketId = nextSocketId++;
+			sockets[socketId] = socket;
+			
+			// Remove the socket when it closes
+			socket.on('close', function () {
+//    	    console.log('socket', socketId, 'closed');
+				delete sockets[socketId];
+			});
+    	});
+    	
         if (LOGREQUESTS) {
             console.log("Incoming Request (" + req.url + ")");
             console.log(req.headers);
@@ -85,10 +103,20 @@ module.exports = function () {
             }); //end path.exists
         }
         else{
-        	console.log(server.urlCallbacks);
+//        	console.log(server.urlCallbacks);
         }
     });
     server.urlCallbacks = {};
     server.onURI        = function (uri, callback) { server.urlCallbacks[uri] = callback; };
+    server.closeNow     = function (callback) { 
+    	  // Destroy all open sockets
+    	  for (socket of Array.from(sockets)) {
+    		  socket.destroy();
+    	  };
+    	// Close the server
+    	  server.close();
+    	  
+    	  callback();
+    };
     return server;
 };

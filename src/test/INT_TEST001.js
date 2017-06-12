@@ -57,7 +57,7 @@ describe("TEST001: Create ReqIF from PDF:", function() {
     
     afterAll(function (done) {
         if (server != null) 
-        	server.close(done);
+        	server.closeNow(done);
         else
         	done();
     });
