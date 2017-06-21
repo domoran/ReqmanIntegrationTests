@@ -32,12 +32,14 @@ module.exports = function () {
     	
     	server.on('connection', function (socket) {
 			// Add a newly connected socket
-			var socketId = nextSocketId++;
+			var socketId = nextSocketId;
+			nextSocketId = nextSocketId + 1;
 			sockets[socketId] = socket;
 			
+			console.log("Connection: " + nextSocketId);
 			// Remove the socket when it closes
 			socket.on('close', function () {
-//    	    console.log('socket', socketId, 'closed');
+    	    console.log('socket', socketId, 'closed');
 				delete sockets[socketId];
 			});
     	});
@@ -109,14 +111,18 @@ module.exports = function () {
     server.urlCallbacks = {};
     server.onURI        = function (uri, callback) { server.urlCallbacks[uri] = callback; };
     server.closeNow     = function (callback) { 
+    		
+    		console.log("CloseNow");
+    		console.log("SocketNumber: " + JSON.stringify(sockets));
     	  // Destroy all open sockets
     	  for (socket of Array.from(sockets)) {
+    		  console.log("Close socket hard: " + socket);
     		  socket.destroy();
     	  };
     	// Close the server
-    	  server.close();
+    	  server.close(callback);
     	  
-    	  callback();
+    	  
     };
     return server;
 };

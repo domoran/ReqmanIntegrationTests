@@ -16,12 +16,12 @@
   },
   "devDependencies": {},
   "scripts": {
-  	"pretest": "./scripts/clean_folders.bat & ./scripts/start_servers.bat",
+  	"pretest": "cd scripts && call clean_folders.bat",
     "unit": "./node_modules/.bin/jasmine-node --captureExceptions --autotest src/utils",
     "debug": "node src/test/debug.js",
     "debug_p": "./node_modules/.bin/protractor test_config.js --suite deb",
     "config": "./node_modules/.bin/protractor test_config.js --suite configure",
-    "tests": "./node_modules/.bin/protractor test_config.js --suite api,integration",
+    "test": "./node_modules/.bin/protractor test_config.js --suite api,integration",
     "full": "./node_modules/.bin/protractor test_config.js --suite configure,api,integration,teardown",
     "lint": "./node_modules/.bin/eslint --fix src"
   },

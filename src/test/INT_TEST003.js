@@ -11,6 +11,7 @@ var createServer = require("../utils/webserver"),
 	ReqmanAPI = require("../utils/ReqmanAPI"),
 	TestUtils = require("../utils/TestUtils"),
 	CommentarySheetHandler = require("../utils/CommentarySheetHandler"),
+	ReqIFHandler = require("../utils/ReqIFHandler"),
 	fs = require("fs"),
 	path = require("path"),
 	EC = protractor.ExpectedConditions,
@@ -32,7 +33,8 @@ describe("TEST003: Excel Template Reimport:", function() {
     var excelExportName = null;
     
     // Test constants
-	var TESTFILENAME = null;
+	var EXCELTESTFILENAME = null;
+	var REQIFTESTFILENAME = null;
 	var OUTPUTFILENAME = "TEST003.reqifz";
 	var EXCELZIPFILENAME = "TEST002.zip";
 	var MANIPULATEDEXCELFILENAME = "TEST003_MODIFIED.xlsx"
@@ -105,7 +107,7 @@ describe("TEST003: Excel Template Reimport:", function() {
 //        				files.forEach(function(file){
 //        					if (TestUtils().endsWith(file, "xlsx")){
 //        						counter++;
-//        						TESTFILENAME = file;
+//        						EXCELTESTFILENAME = file;
 //        					}
 //        				});
 //        				expect(counter).toBe(1);
@@ -126,7 +128,7 @@ describe("TEST003: Excel Template Reimport:", function() {
 			files.forEach(function(file){
 				if (TestUtils().endsWith(file, "xlsx")){
 					counter++;
-					TESTFILENAME = file;
+					EXCELTESTFILENAME = file;
 				}
 			});
 			expect(counter).toBe(1);
@@ -135,9 +137,9 @@ describe("TEST003: Excel Template Reimport:", function() {
 	}, 30000);
 	
 	it("PREPARATION: Should be able to manipulate the excel file", function (done) {
-		if (!TESTFILENAME) { pending(); return; }
+		if (!EXCELTESTFILENAME) { pending(); return; }
 		
-		var excelFilePath = path.join(data_directory, TESTFILENAME);
+		var excelFilePath = path.join(data_directory, EXCELTESTFILENAME);
 		
 		var comSheet = CommentarySheetHandler(excelFilePath);
     	
@@ -160,7 +162,7 @@ describe("TEST003: Excel Template Reimport:", function() {
 		    
     // Start test actions
     it("Should be possible to validate Excel comment file", function (done) {
-    	if (!TESTFILENAME) { pending(); return; }
+    	if (!EXCELTESTFILENAME) { pending(); return; }
     	
         var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + MANIPULATEDEXCELFILENAME;
 
@@ -178,7 +180,7 @@ describe("TEST003: Excel Template Reimport:", function() {
     });
     
     it("Should be possible to upload a Excel comment document via API", function (done) {
-    	if (!TESTFILENAME) { pending(); return; }
+    	if (!EXCELTESTFILENAME) { pending(); return; }
 
         var url = "http://localhost:" + WEBSERVER_PORT + "/data/TEST003/" + MANIPULATEDEXCELFILENAME,
 		callbackUrl = "http://localhost:" + WEBSERVER_PORT + "/callback",
@@ -203,23 +205,7 @@ describe("TEST003: Excel Template Reimport:", function() {
 	        documentID = data;
 	    });
 	}, 25000);
-           
-    //TODO: Check if changes appear in GUI
-//    it("Should be possible to visit the document page", function (done) {
-//        if (!documentID || !userToken || !documentScanned || !documentExportLink) { pending(); return; }
-//        
-//        var documentDetailPage = PageDocumentDetails(documentLink, config);
-//        browser.ignoreSynchronization = true;
-//        documentDetailPage.visitScannedDocument(function(){
-//        	
-//        	var heading = element(by.xpath("//div[normalize-space(text())='Ich bin ein Heading']"));
-//        	expect(heading.isPresent()).toBe(true);
-//			
-//			done();
-//			browser.ignoreSynchronization = false;
-//        });
-//    });
-    
+               
     it("Should be possible to trigger ReqIF Creation for the scanned document", function (done) {
         if (!documentScanned) { pending(); return; }
 
@@ -243,6 +229,55 @@ describe("TEST003: Excel Template Reimport:", function() {
             	});
             });
         });
+    });
+    
+    it("Should be able to extract the ReqIFz file in the TEST003 folder", function (done) {
+		
+		var reqifzFilePath = path.join(data_directory + "/../Download", OUTPUTFILENAME);
+		var extractionPath = data_directory;
+		
+		fs.exists(reqifzFilePath, function(exists) {
+    		expect(exists).toBe(true);
+    		
+    		if (exists){
+    			TestUtils().unzipFile(reqifzFilePath, extractionPath, function(){
+        			var counter = 0;
+        			fs.readdir(extractionPath, function(err, files){
+        				expect(err).toBe(null);
+        				files.forEach(function(file){
+        					if (TestUtils().endsWith(file, "reqif")){
+        						counter++;
+        						REQIFTESTFILENAME = file;
+        					}
+        				});
+        				expect(counter).toBe(1);
+        				done();
+        			});
+        		});	
+    		}		
+    	});
+	}, 30000);
+    
+    it("Should be able to identify the correctness of the ReqIF file content", function (done){
+    	 if (!REQIFTESTFILENAME) { pending(); return; }
+    	var reqifFilePath = path.join(data_directory, REQIFTESTFILENAME);
+    	
+    	var reqIfHandler = ReqIFHandler(reqifFilePath);
+    	
+    	browser.wait(reqIfHandler.isReqIFReady).then(function () {	
+    		var reqifContent = reqIfHandler.printData(false, false);
+    		
+    		var contentToBe = 	[
+    								{type:"Heading", text: "Ich bin ein neues Heading"},
+    								{type:"Requirement", text:"Wenn du mit 23 Menschen in einem Raum bist, gibt es eine 50 prozentige Chance, dass zwei am gleichen Tag Geburtstag haben."},
+    								{type:"Heading", text: "Added Heading"},
+    								{type:"Requirement", text: "Added Requirement"}
+    							];
+    		
+    		 expect(reqifContent).toEqual(JSON.stringify(contentToBe));
+    		 
+    		 done();
+    	});
     });
     
 });
