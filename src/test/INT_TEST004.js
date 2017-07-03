@@ -36,13 +36,13 @@ describe("TEST004: Reimport changed PDF:", function() {
 	var PROFILENAME = "TEST004 Profil";
 	var TESTDOCUMENTID_CONFIGNAME = "TEST001DOCID";
 	
-    beforeEach(function () {
-        server = createServer().listen(WEBSERVER_PORT);
-    });
-
-    afterEach(function () {
-        if (server != null) server.close();
-    });
+//    beforeEach(function () {
+//        server = createServer().listen(WEBSERVER_PORT);
+//    });
+//
+//    afterEach(function () {
+//        if (server != null) server.close();
+//    });
     
     beforeAll(function(){
     	console.log("\nStart TEST004");

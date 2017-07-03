@@ -21,9 +21,11 @@ var mimeTypes = {
     "js": "text/javascript",
     "css": "text/css"};
 
-var sockets = {};
+
 
 module.exports = function () {
+	var sockets = {};
+	
     var server = http.createServer(function(req, res) {
 
     	//Maintain a hash of all connected sockets
@@ -35,11 +37,9 @@ module.exports = function () {
 			var socketId = nextSocketId;
 			nextSocketId = nextSocketId + 1;
 			sockets[socketId] = socket;
-			
-			console.log("Connection: " + nextSocketId);
+
 			// Remove the socket when it closes
 			socket.on('close', function () {
-    	    console.log('socket', socketId, 'closed');
 				delete sockets[socketId];
 			});
     	});
@@ -50,8 +50,6 @@ module.exports = function () {
         }
 
         var uri = url.parse(req.url).pathname;
-        
-//        console.log("URI: " + uri);
 
       // If no URI is passed or the root is queried return a hello world html page
         if (!uri || uri == "/") {
@@ -66,9 +64,7 @@ module.exports = function () {
         });
 
         var hasURICallback = !!server.urlCallbacks[uri];
-        
-//        console.log("HasURICallback: " + hasURICallback);
-
+   
         req.on("end", function () {
             if (LOGREQUESTS) {
                 console.log(requestData);
@@ -78,7 +74,6 @@ module.exports = function () {
                 if (req.headers["content-type"] && req.headers["content-type"].indexOf("/json") >= 0) {
                     requestData = JSON.parse(requestData);
                 }
-//                console.log("Kurz vor Callback");
                 server.urlCallbacks[uri](req.headers, requestData);
                 server.urlCallbacks[uri] = null;
                 res.end('ok');
@@ -111,18 +106,14 @@ module.exports = function () {
     server.urlCallbacks = {};
     server.onURI        = function (uri, callback) { server.urlCallbacks[uri] = callback; };
     server.closeNow     = function (callback) { 
-    		
-    		console.log("CloseNow");
-    		console.log("SocketNumber: " + JSON.stringify(sockets));
     	  // Destroy all open sockets
     	  for (socket of Array.from(sockets)) {
-    		  console.log("Close socket hard: " + socket);
     		  socket.destroy();
     	  };
     	// Close the server
-    	  server.close(callback);
+    	  server.close();
     	  
-    	  
+    	  callback();
     };
     return server;
 };
