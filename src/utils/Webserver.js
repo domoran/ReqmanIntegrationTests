@@ -21,9 +21,29 @@ var mimeTypes = {
     "js": "text/javascript",
     "css": "text/css"};
 
+
+
 module.exports = function () {
+	var sockets = {};
+	
     var server = http.createServer(function(req, res) {
 
+    	//Maintain a hash of all connected sockets
+    	var nextSocketId = 0;
+    	sockets = {};
+    	
+    	server.on('connection', function (socket) {
+			// Add a newly connected socket
+			var socketId = nextSocketId;
+			nextSocketId = nextSocketId + 1;
+			sockets[socketId] = socket;
+
+			// Remove the socket when it closes
+			socket.on('close', function () {
+				delete sockets[socketId];
+			});
+    	});
+    	
         if (LOGREQUESTS) {
             console.log("Incoming Request (" + req.url + ")");
             console.log(req.headers);
@@ -44,7 +64,7 @@ module.exports = function () {
         });
 
         var hasURICallback = !!server.urlCallbacks[uri];
-
+   
         req.on("end", function () {
             if (LOGREQUESTS) {
                 console.log(requestData);
@@ -55,6 +75,8 @@ module.exports = function () {
                     requestData = JSON.parse(requestData);
                 }
                 server.urlCallbacks[uri](req.headers, requestData);
+                server.urlCallbacks[uri] = null;
+                res.end('ok');
             }
         });
 
@@ -77,9 +99,21 @@ module.exports = function () {
                 fileStream.pipe(res);
             }); //end path.exists
         }
+        else{
+//        	console.log(server.urlCallbacks);
+        }
     });
-
     server.urlCallbacks = {};
     server.onURI        = function (uri, callback) { server.urlCallbacks[uri] = callback; };
+    server.closeNow     = function (callback) { 
+    	  // Destroy all open sockets
+    	  for (socket of Array.from(sockets)) {
+    		  socket.destroy();
+    	  };
+    	// Close the server
+    	  server.close();
+    	  
+    	  callback();
+    };
     return server;
 };

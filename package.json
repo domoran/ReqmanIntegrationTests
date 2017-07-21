@@ -9,13 +9,20 @@
     "jasmine-node": "^1.14.5",
     "nock": "^9.0.7",
     "protractor": "^5.1.1",
-    "protractor-helpers": "^1.1.0"
+    "protractor-helpers": "^1.1.0",
+    "xlsx": "^0.9.13",
+    "xml2js": "^0.4.16",
+    "unzip": "^0.1.11" 
   },
   "devDependencies": {},
   "scripts": {
+  	"pretest": "cd scripts && call clean_folders.bat",
     "unit": "./node_modules/.bin/jasmine-node --captureExceptions --autotest src/utils",
+    "debug": "node src/test/debug.js",
+    "debug_p": "./node_modules/.bin/protractor test_config.js --suite deb",
     "config": "./node_modules/.bin/protractor test_config.js --suite configure",
-    "tests": "./node_modules/.bin/protractor test_config.js --suite api,integration",
+    "test": "./node_modules/.bin/protractor test_config.js --suite api,integration",
+    "full": "./node_modules/.bin/protractor test_config.js --suite configure,api,integration,teardown",
     "lint": "./node_modules/.bin/eslint --fix src"
   },
   "repository": {
