@@ -48,6 +48,12 @@ start java -Dwebdriver.chrome.driver=%CD%\chromedriver.exe -jar selenium-server-
 ```
   SET REQMANSERVER=http://localhost:90
 ```
+```
+  SET REQMANADMINUSER=???
+```
+```
+  SET REQMANADMINPASS=???
+```
 2. make sure that the API tokens are correctly configured (only once)
 ```
   npm run config
